@@ -28,6 +28,6 @@ const transporter = nodemailer.createTransport({
            html,
        };
        const info =await transporter.sendMail(mailOptions);
-       console.log("Email sent:", info);
+    //    console.log("Email sent:", info);
     }
 
