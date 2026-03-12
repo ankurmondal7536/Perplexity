@@ -4,6 +4,7 @@ import connectDB from "./src/config/database.js";
 
 const PORT = process.env.PORT || 8000;
 
+
 connectDB()
     .catch((err) => {
         console.error("MongoDB connection failed:", err);
