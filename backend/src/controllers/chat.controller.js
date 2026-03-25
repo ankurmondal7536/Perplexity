@@ -51,7 +51,7 @@ export async function sendMessage(req, res) {
         chat: chatId || chat._id,
         content: response,
         role: "ai",
-        model: "Gemini"
+        model: "Mistral AI"
     })
 
     const updatedMessages = await messageModel.find({

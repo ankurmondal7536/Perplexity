@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Menu, X, Plus, Send, Paperclip, ChevronDown } from 'lucide-react'
 import "../global/global.css"
 import { setCurrentChatId, setIsLoading } from '../chat.slice'
@@ -8,13 +8,12 @@ import { useChat } from '../hooks/useChat.js'
 export default function Dashboard() {
     // ============= STATE MANAGEMENT =============
 
-
-
+    const messagesEndRef = useRef(null)
     const dispatch = useDispatch()
     const { handleSendMessage, handleFetchMessages, handleFetchChats, initSocket } = useChat()
 
     // adding redux state
-    const { chats, currentChatId,messages,isLoading, error } = useSelector(state => state.chat)
+    const { chats, currentChatId, messages, isLoading, error } = useSelector(state => state.chat)
     // console.log('All chats:', useSelector(state => state.chat.chats))  // ← debug   
     const { user } = useSelector(state => state.auth)
 
@@ -24,18 +23,15 @@ export default function Dashboard() {
     // console.log("all messages:", messages)     //for debug
 
     const recentChats = Object.values(chats).map(chat => ({
-
-
         id: chat._id,
         title: chat.title,
         createdAt: chat.createdAt,
-        lastMessage: chat.lastMessage 
-        ? (chat.lastMessage.length > 50 
-            ? chat.lastMessage.substring(0, 50) + '...'
-            : chat.lastMessage)
-        : 'No messages yet'
-
-    } )  )
+        lastMessage: chat.lastMessage
+            ? (chat.lastMessage.length > 50
+                ? chat.lastMessage.substring(0, 50) + '...'
+                : chat.lastMessage)
+            : 'No messages yet'
+    }))
     // console.log("recentChats:", recentChats)     //for debug ie checking recentchats
 
     // using useEffect to initialize socket connection
@@ -56,23 +52,20 @@ export default function Dashboard() {
         }
     }, [currentChatId])
 
+    // auto scroll to bottom
+    useEffect(() => {
+        // Jab messages update हों तो scroll करो
+        setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+        }, 100)
+    }, [messages])
+
+
     //local state
     const [sidebarOpen, setSidebarOpen] = useState(false) // Default false on mobile
     const [inputValue, setInputValue] = useState('')
     const [selectedFile, setSelectedFile] = useState(null)
 
-
-
-
-
-
-    // const recentChats = [
-    //     { id: 1, title: 'System design kya hai', createdAt: 'Today', lastMessage: '2 hours ago' },
-    //     { id: 2, title: 'LangChain aur Mistral AI', createdAt: 'Yesterday', lastMessage: '5 hours ago' },
-    //     { id: 3, title: 'React hooks', createdAt: '2 days ago', lastMessage: '1 day ago' },
-    // ]
-
-    // const currentChat = recentChats.find(chat => chat.id === currentChatId)
 
     // ============= HANDLERS =============
     const handleNewChat = () => {
@@ -88,49 +81,37 @@ export default function Dashboard() {
     }
 
     const handleSendMsg = async () => {
-        console.log("inputValue:", inputValue)     //for debug
-        console.log("currentChatId:", currentChatId)     //for debug
-        if (!inputValue.trim() || !currentChatId) {
-            console.log("inputValue or currentChatId is empty")     //for debug
+        // console.log("inputValue:", inputValue)     //for debug
+        // console.log("currentChatId:", currentChatId)     //for debug
+        if (!inputValue.trim()) {
+            console.log("inputValue is empty")     //for debug
             return
         }
-        
-        console.log("sending follow-up message to chatId:", currentChatId)     //for debug
+        if (!currentChatId) {
+            // console.log("New chat - creating new chat with message")  // ← debug
+            // नया chat create होगा backend में
+        } 
+        // else {
+        //     // console.log("📝 Follow-up message to existing chat:", currentChatId)  // ← debug
+        // }
+
+        // console.log("sending follow-up message to chatId:", currentChatId)     //for debug
         // setIsLoading(true)
 
-       try{
-         await handleSendMessage({
-            message: inputValue,
-            chatId: currentChatId
-        })
-        setInputValue('')
-        setSelectedFile(null)
-       }
-       catch(error){
-           console.log("Error:", error)     //for debug
-       }
+        try {
+            const result = await handleSendMessage({
+                message: inputValue,
+                chatId: currentChatId
+            })
+            // console.log('🔍message sent, Result:', result)  //is the result undefined?  // ← debug
+            setInputValue('')
+            setSelectedFile(null)
 
 
-
-
-
-
-        // setMessages([...messages, userMessage])
-        // setInputValue('')
-        // setSelectedFile(null)
-        // setIsLoading(true)
-
-        // setTimeout(() => {
-        //     const aiMessage = {
-        //         id: Date.now() + 1,
-        //         type: 'ai',
-        //         content: 'Ye AI ka response hoga.',
-        //         timestamp: new Date(),
-        //         model: 'Mistral AI'
-        //     }
-        //     setMessages(prev => [...prev, aiMessage])
-        //     setIsLoading(false)
-        // }, 1500)
+        }
+        catch (error) {
+            console.log("Error:", error)     //for debug 
+        }
     }
 
     const handleFileUpload = (e) => {
@@ -294,8 +275,10 @@ export default function Dashboard() {
                                         {msg.role === 'ai' && msg.model && (
                                             <p className="text-xs text-[#31b8c6]">{msg.model}</p>
                                         )}
+
                                     </div>
                                 </div>
+
                             </div>
                         ))
                     )}
@@ -315,8 +298,10 @@ export default function Dashboard() {
                                     ></div>
                                 </div>
                             </div>
+
                         </div>
                     )}
+                    <div ref={messagesEndRef} />
                 </div>
 
                 {/* ============= INPUT AREA ============= */}
@@ -376,7 +361,7 @@ export default function Dashboard() {
 
                         {/* Model Info */}
                         <p className="text-xs text-zinc-500 mt-2 text-center">
-                            Using: <span className="text-[#31b8c6]">Mistral AI</span>
+                            <span className="text-[#31b8c6]">JNX AI</span>
                         </p>
                     </div>
                 </div>

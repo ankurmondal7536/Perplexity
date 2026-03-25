@@ -9,8 +9,8 @@ export const useChat = () => {
     const dispatch = useDispatch()
 
     const handleSendMessage = async ({ message, chatId }) => {
-        console.log('🔍 useChat - message:', message)
-        console.log('🔍 useChat - chatId:', chatId)  // ✅ Ye undefined तो नहीं?
+        // console.log('🔍 useChat - message:', message)  // ← debug
+        // console.log('🔍 useChat - chatId:', chatId)  // ✅ Ye undefined तो नहीं?
 
         try {
             const result = await dispatch(sendMessageThunk({ message, chatId }))

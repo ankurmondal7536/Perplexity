@@ -21,9 +21,9 @@ export const fetchChatsThunk = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             // console.log('Thunk running')  // <-- debug  
-            const response  = await chatAPI.getChats()
+            const response = await chatAPI.getChats()
             // console.log('Thunk response:', response)  // <-- debug
-            
+
             return response.chats || []
         } catch (error) {
             console.log('Thunk error:', error)  // <-- debug
@@ -147,23 +147,46 @@ const chatSlice = createSlice({
             })
             .addCase(sendMessageThunk.fulfilled, (state, action) => {
                 // console.log("Message send MS.F", action.payload)     //for debug
-                const { chat } = action.payload
-                // Update chat in chats object
-                state.chats[chat._id] = {
-                    ...state.chats[chat._id],
-                    messages: chat.messages
+                const { chat, title } = action.payload
+                if (!chat || !chat._id) return
+
+                // Check if chat already exists
+                if (!state.chats[chat._id]) {
+                    // create new chat
+                    state.chats[chat._id] = {
+                        _id: chat._id,
+                        title: title || 'New Chat',
+                        messages: chat.messages || [],
+                        createdAt: new Date().toISOString(),
+                        lastMessage: chat.messages?.[chat.messages.length - 1]?.content || ''
+                    }
+                    // console.log('New chat created:', chat._id)  // ← debug 
+                } else {
+                    // Existing chat update करो
+                    state.chats[chat._id] = {
+                        ...state.chats[chat._id],
+                        messages: chat.messages || []
+                    }
+                    // console.log('Existing chat updated:', chat._id)  // ← debug
                 }
+                // IMPORTANT: set currentChatId
+                state.currentChatId = chat._id
+                // console.log('Current chat ID set to:', chat._id)  // ← debug
+
                 // Update messages array
-                if(chat && chat.messages){
-                state.chats[chat._id].messages = chat.messages
-                state.messages = chat.messages
-            }
+                state.messages = chat.messages || []
                 state.isLoading = false
+                state.error = null
+
+
+
             
+
             })
             .addCase(sendMessageThunk.rejected, (state, action) => {
                 state.isLoading = false
                 state.error = action.payload
+                console.log('❌ Error in sendMessageThunk:', action.payload)
             })
 
             // ============ DELETE CHAT ============
