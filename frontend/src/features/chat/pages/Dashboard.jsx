@@ -4,6 +4,8 @@ import "../global/global.css"
 import { setCurrentChatId, setIsLoading } from '../chat.slice'
 import { useSelector, useDispatch } from 'react-redux'
 import { useChat } from '../hooks/useChat.js'
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function Dashboard() {
     // ============= STATE MANAGEMENT =============
@@ -90,7 +92,7 @@ export default function Dashboard() {
         if (!currentChatId) {
             // console.log("New chat - creating new chat with message")  // ← debug
             // नया chat create होगा backend में
-        } 
+        }
         // else {
         //     // console.log("📝 Follow-up message to existing chat:", currentChatId)  // ← debug
         // }
@@ -130,7 +132,7 @@ export default function Dashboard() {
 
             {/* ============= SIDEBAR ============= */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 w-64 bg-black/95 backdrop-blur-xl border-r border-[#31b8c6]/20 transition-transform duration-300 overflow-y-auto md:relative md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                className={`fixed flex flex-col inset-y-0 left-0 z-50 w-64 bg-black/95 backdrop-blur-xl border-r border-[#31b8c6]/20 transition-transform duration-300 overflow-y-auto md:relative md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                     }`}
             >
                 {/* Mobile Header */}
@@ -140,24 +142,23 @@ export default function Dashboard() {
                     </h1>
                     <button
                         onClick={() => setSidebarOpen(false)}
-                        className="p-1 hover:bg-zinc-800 rounded-lg transition md:hidden"
-                    >
+                        className="p-1 hover:bg-zinc-800 rounded-lg transition md:hidden">
                         <X size={18} />
                     </button>
                 </div>
 
                 {/* Desktop Header - Above New Chat Button */}
-                <div className="hidden md:block p-4 border-b border-[#31b8c6]/20">
+                <div className="hidden shrink-0 md:block p-4 border-b border-[#31b8c6]/20">
                     <h1 className="text-2xl font-bold bg-gradient-to-r from-[#31b8c6] to-[#45c7d4] bg-clip-text text-transparent">
                         JNXAI
                     </h1>
-                    <p className="text-xs text-zinc-400 mt-1">AI Chat</p>
+
                 </div>
 
                 {/* New Chat Button */}
                 <button
                     onClick={handleNewChat}
-                    className="mx-3 mt-3 w-[calc(100%-1.5rem)] flex items-center justify-center gap-2 bg-gradient-to-r from-[#31b8c6] to-[#45c7d4] text-zinc-950 font-semibold py-2 px-3 rounded-lg hover:shadow-lg hover:shadow-[#31b8c6]/40 transition text-sm md:text-base"
+                    className="mx-3 mt-3 w-[calc(100%-1.5rem)] shrink-0 flex items-center justify-center gap-2 bg-gradient-to-r from-[#31b8c6] to-[#45c7d4] text-zinc-950 font-semibold py-2 px-3 rounded-lg hover:shadow-lg hover:shadow-[#31b8c6]/40 transition text-sm md:text-base"
                 >
                     <Plus size={16} />
                     New Chat
@@ -166,16 +167,17 @@ export default function Dashboard() {
 
 
                 {/* Recent Chats */}
-                <div className="px-3 py-4">
+                <div className="px-3 py-4 flex-1 overflow-y-auto pb-20 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                    {/* {scrollbar hide code - [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]} */}
                     <p className="text-xs font-semibold text-zinc-500 mb-2 uppercase tracking-widest">
                         Recent Chats
                     </p>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                         {recentChats.map(chat => (
                             <button
                                 key={chat.id}
                                 onClick={() => handleSelectChat(chat.id)}
-                                className={`w-full text-left p-2 rounded-lg transition group border text-sm ${currentChatId === chat.id
+                                className={`w-full text-left p-3 rounded-lg transition group border text-sm ${currentChatId === chat.id
                                     ? 'bg-[#31b8c6]/20 border-[#31b8c6]/40'
                                     : 'border-transparent hover:bg-zinc-900/50'
                                     }`}
@@ -191,10 +193,12 @@ export default function Dashboard() {
                 </div>
 
                 {/* User Profile */}
-                <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-[#31b8c6]/20 bg-black/50 backdrop-blur">
+                <div className="absolute bottom-0 left-0 right-0 p-3 border-t shrink-0 border-[#31b8c6]/20 bg-black/50 backdrop-blur">
                     <button className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-zinc-900/50 transition group border border-transparent hover:border-[#31b8c6]/30">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#31b8c6] to-[#45c7d4] flex items-center justify-center font-bold text-zinc-950 flex-shrink-0 text-xs">
-                            {user?.avatar || "U"}
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-zinc-950 flex-shrink-0 text-xs bg-[url('https://ik.imagekit.io/ankur7536/default%20profile?updatedAt=1770912317000')] bg-cover bg-center">
+
+
+                            {/* {user?.avatar || "U"} */}
                         </div>
                         <div className="flex-1 text-left min-w-0">
                             <p className="text-xs font-semibold truncate group-hover:text-[#31b8c6]">
@@ -239,7 +243,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* ============= MESSAGES ============= */}
-                <div className="flex-1 overflow-y-auto px-2 md:px-4 py-4 space-y-3 md:space-y-6 scroll-smooth">
+                <div className="font-mono flex-1 overflow-y-auto px-2 md:px-4 py-4 space-y-3 md:space-y-5 scroll-smooth">
                     {messages.length === 0 ? (
                         <div className="h-full flex items-center justify-center flex-col gap-3">
                             <div className="text-4xl md:text-6xl animate-bounce">✨</div>
@@ -259,9 +263,30 @@ export default function Dashboard() {
                                         : 'bg-zinc-900/60 border border-[#31b8c6]/20 text-zinc-100 rounded-bl-none'
                                         }`}
                                 >
-                                    <p className="leading-relaxed break-words whitespace-pre-wrap">
-                                        {msg.content}
+
+                                    <p className="leading-relaxed wrap-break-words whitespace-pre-wrap">
+                                        <ReactMarkdown
+                                            remarkPlugins={[remarkGfm]}
+                                            components={{
+                                                // Link styling
+                                                a: ({ node, ...props }) => (
+                                                    <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800" />
+                                                ),
+                                                // Table styling
+                                                table: ({ node, ...props }) => (
+                                                    <div className="overflow-x-auto my-4 border rounded-lg">
+                                                        <table {...props} className="min-w-full divide-y divide-black-800 font-mono text-sm" />
+                                                    </div>
+                                                ),
+                                                thead: ({ node, ...props }) => <thead {...props} className="bg-gradient-to-r from-cyan-500 to-cyan-400" />,
+                                                th: ({ node, ...props }) => <th {...props} className="px-4 py-2 text-left text-gray-900 font-bold border-b" />,
+                                                td: ({ node, ...props }) => <td {...props} className="px-4 py-2 border-b border-gray-100" />
+                                            }}
+                                        >
+                                            {msg.content}
+                                        </ReactMarkdown>
                                     </p>
+
                                     <div className="flex items-center justify-between gap-2 mt-2">
                                         <p
                                             className={`text-xs ${msg.role === 'user' ? 'text-zinc-800' : 'text-zinc-500'
