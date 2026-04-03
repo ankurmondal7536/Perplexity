@@ -111,7 +111,7 @@ Make the user feel like they are chatting with a smart, chill, helpful friend �
         })
         const lastMessage = res.messages[res.messages.length - 1]
 
-        let response = (lastMessage.output||lastMessage.content || lastMessage.text || "").replace(/[#*`>]/g, '').trim()// removing markdown formatting
+        let response = (lastMessage.output||lastMessage.content || lastMessage.text || "").replace(/[#*`>]/g, '' && /[—]/g, "-").trim()// removing markdown formatting
 
         // console.log('📊 Full response:', res);  // <-- debug
         // console.log('📊 Response keys:', Object.keys(res));  // <-- debug

@@ -33,7 +33,7 @@ export async function register(req, res) {
         to: user.email,
         subject: "Welcome to Perplexity",
         html: `
-        <p>Welcome to Perplexity AI, ${username}!</p>
+        <p>Welcome to JNX AI, ${username}!</p>
         <p>Please verify your email by clicking the following link:</p>
         <a href="http://localhost:3000/api/auth/verify-email?token=${emailVerificationToken}">Verify Email</a>
         `
