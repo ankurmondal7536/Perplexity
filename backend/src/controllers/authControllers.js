@@ -35,7 +35,7 @@ export async function register(req, res) {
         html: `
         <p>Welcome to JNX AI, ${username}!</p>
         <p>Please verify your email by clicking the following link:</p>
-        <a href="http://localhost:3000/api/auth/verify-email?token=${emailVerificationToken}">Verify Email</a>
+        <a href="https://perplexity-jnxai.onrender.com/api/auth/verify-email?token=${emailVerificationToken}">Verify Email</a>
         `
     })
 
@@ -143,7 +143,7 @@ export async function verifyEmail(req, res) {
         const html = `
         <h1>Email Verified Successfully!</h1>
         <p>Your email has been verified. You can now log in to your account.</p>
-        <a href="http://localhost:5173/login">Go to Login</a> 
+        <a href="https://perplexity-jnxai.onrender.com/login">Go to Login</a> 
     ` // * the a tag needs to be changed after deployment.
     
         return res.send(html);
