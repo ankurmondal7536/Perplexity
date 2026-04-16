@@ -2,12 +2,12 @@ import axios from 'axios'
 
 
 const api = axios.create({
-    baseURL:'http://localhost:3000',
+    baseURL: import.meta.env.MODE === "production" ? "/" : "http://localhost:3000/",
     withCredentials: true,
 })
 
 export const sendMessage = async ({ message, chatId }) => {
-    const response = await api.post('/api/chats/message', { message, chat:chatId })
+    const response = await api.post('/api/chats/message', { message, chat: chatId })
     return response.data
 }
 

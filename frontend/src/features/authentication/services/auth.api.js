@@ -2,7 +2,7 @@ import axios from "axios";
 
 
 const api = axios.create({
-    baseURL: import.meta.env.MODE === "production" ? "/api" : "http://localhost:3000/api",
+    baseURL: import.meta.env.MODE === "production" ? "/" : "http://localhost:3000/",
     withCredentials: true,
 });
 
