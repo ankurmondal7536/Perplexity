@@ -18,6 +18,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan('dev'));
 
+// Set build path
+const buildPath = path.join(__dirname, "../public/dist");
+
 app.use(cors({
     origin: (origin, callback) => {
         const allowedOrigins = [
@@ -38,13 +41,16 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }));
 
+// Serve static files from build directory
+app.use(express.static(buildPath));
+
 // Health check
 app.get("/api/health", (req, res) => {
     res.json({ message: "Server is running" });
 });
 
 
-app.use(express.static(path.join(__dirname, './public/dist')));
+// app.use(express.static(path.join(__dirname, './public/dist')));
 
 // Auth routes
 app.use("/api/auth", authRouter);
@@ -53,11 +59,11 @@ app.use("/api/auth", authRouter);
 app.use("/api/chats", chatRouter);
 
 // Wildcard route
-app.get('{*path}', (req, res) => {
+app.get(/^\/(?!api).*/, (req, res) => {
     if (req.path.startsWith('/api')) {
         return res.status(404).json({ message: 'API not found' });
     }
-    res.sendFile(path.join(__dirname, './public/dist/index.html'));
+    res.sendFile(path.join(buildPath, 'index.html'));
 });
 
 export default app;
