@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router'
 import { useAuth } from '../hooks/useAuth.js'
 import { useSelector } from 'react-redux'
 import { Navigate } from 'react-router'
+import { Loader } from 'lucide-react'
 
 
 const Login = () => {
@@ -84,7 +85,8 @@ const Login = () => {
                                 onChange={(event) => setEmail(event.target.value)}
                                 placeholder="you@example.com"
                                 required
-                                className="w-full rounded-lg border border-zinc-700 bg-zinc-950/80 px-4 py-3 text-zinc-100 outline-none ring-0 transition focus:border-[#31b8c6] focus:shadow-[0_0_0_3px_rgba(49,184,198,0.25)]"
+                                disabled={loading}
+                                className="w-full rounded-lg border border-zinc-700 bg-zinc-950/80 px-4 py-3 text-zinc-100 outline-none ring-0 transition focus:border-[#31b8c6] focus:shadow-[0_0_0_3px_rgba(49,184,198,0.25)] disabled:opacity-60 disabled:cursor-not-allowed"
                             />
                         </div>
 
@@ -99,16 +101,24 @@ const Login = () => {
                                 onChange={(event) => setPassword(event.target.value)}
                                 placeholder="Enter your password"
                                 required
-                                className="w-full rounded-lg border border-zinc-700 bg-zinc-950/80 px-4 py-3 text-zinc-100 outline-none ring-0 transition focus:border-[#31b8c6] focus:shadow-[0_0_0_3px_rgba(49,184,198,0.25)]"
+                                disabled={loading}
+                                className="w-full rounded-lg border border-zinc-700 bg-zinc-950/80 px-4 py-3 text-zinc-100 outline-none ring-0 transition focus:border-[#31b8c6] focus:shadow-[0_0_0_3px_rgba(49,184,198,0.25)] disabled:opacity-60 disabled:cursor-not-allowed"
                             />
                         </div>
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full rounded-lg bg-[#31b8c6] px-4 py-3 font-semibold text-zinc-950 transition hover:bg-[#45c7d4] focus:outline-none focus:shadow-[0_0_0_3px_rgba(49,184,198,0.35)]"
+                            className="w-full rounded-lg bg-[#31b8c6] px-4 py-3 font-semibold text-zinc-950 transition hover:bg-[#45c7d4] focus:outline-none focus:shadow-[0_0_0_3px_rgba(49,184,198,0.35)] disabled:opacity-70 disabled:cursor-not-allowed relative overflow-hidden group"
                         >
-                            Login
+                            {loading ? (
+                                <div className="flex items-center justify-center gap-2">
+                                    <Loader size={18} className="animate-spin" />
+                                    <span>Logging in...</span>
+                                </div>
+                            ) : (
+                                'Login'
+                            )}
                         </button>
                     </form>
 

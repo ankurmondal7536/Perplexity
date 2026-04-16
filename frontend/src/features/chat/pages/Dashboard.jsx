@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Menu, X, Plus, Send } from 'lucide-react'
+import { Menu, X, Plus, Send, Loader } from 'lucide-react'
 import "../global/global.css"
 import { setCurrentChatId } from '../chat.slice'
 import { useSelector, useDispatch } from 'react-redux'
@@ -103,10 +103,20 @@ export default function Dashboard() {
                 {/* New Chat Button */}
                 <button
                     onClick={handleNewChat}
-                    className="mx-3 mt-3 w-[calc(100%-1.5rem)] shrink-0 flex items-center justify-center gap-2 bg-gradient-to-r from-[#31b8c6] to-[#45c7d4] text-zinc-950 font-semibold py-2 px-3 rounded-lg hover:shadow-lg hover:shadow-[#31b8c6]/40 transition text-sm md:text-base"
+                    disabled={isLoading}
+                    className="mx-3 mt-3 w-[calc(100%-1.5rem)] shrink-0 flex items-center justify-center gap-2 bg-gradient-to-r from-[#31b8c6] to-[#45c7d4] text-zinc-950 font-semibold py-2 px-3 rounded-lg hover:shadow-lg hover:shadow-[#31b8c6]/40 transition text-sm md:text-base disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                    <Plus size={16} />
-                    New Chat
+                    {isLoading ? (
+                        <>
+                            <Loader size={16} className="animate-spin" />
+                            <span>Loading...</span>
+                        </>
+                    ) : (
+                        <>
+                            <Plus size={16} />
+                            <span>New Chat</span>
+                        </>
+                    )}
                 </button>
 
                 {/* Recent Chats */}
@@ -115,21 +125,35 @@ export default function Dashboard() {
                         Recent Chats
                     </p>
                     <div className="space-y-3">
-                        {recentChats.map(chat => (
-                            <button
-                                key={chat.id}
-                                onClick={() => handleSelectChat(chat.id)}
-                                className={`w-full text-left p-3 rounded-lg transition group border text-sm ${currentChatId === chat.id
-                                    ? 'bg-[#31b8c6]/20 border-[#31b8c6]/40'
-                                    : 'border-transparent hover:bg-zinc-900/50'
-                                    }`}
-                            >
-                                <p className="text-xs font-medium truncate group-hover:text-[#31b8c6] transition line-clamp-2">
-                                    {chat.title}
-                                </p>
-                                <p className="text-xs text-zinc-500 mt-0.5">{chat.lastMessage}</p>
-                            </button>
-                        ))}
+                        {isLoading && recentChats.length === 0 ? (
+                            <>
+                                <div className="animate-pulse space-y-3">
+                                    {[...Array(3)].map((_, i) => (
+                                        <div key={i} className="w-full p-3 rounded-lg bg-zinc-900/30 border border-[#31b8c6]/10">
+                                            <div className="h-3 bg-[#31b8c6]/20 rounded w-3/4 mb-2"></div>
+                                            <div className="h-2 bg-[#31b8c6]/10 rounded w-1/2"></div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        ) : (
+                            recentChats.map(chat => (
+                                <button
+                                    key={chat.id}
+                                    onClick={() => handleSelectChat(chat.id)}
+                                    disabled={isLoading}
+                                    className={`w-full text-left p-3 rounded-lg transition group border text-sm disabled:opacity-60 disabled:cursor-not-allowed ${currentChatId === chat.id
+                                        ? 'bg-[#31b8c6]/20 border-[#31b8c6]/40'
+                                        : 'border-transparent hover:bg-zinc-900/50'
+                                        }`}
+                                >
+                                    <p className="text-xs font-medium truncate group-hover:text-[#31b8c6] transition line-clamp-2">
+                                        {chat.title}
+                                    </p>
+                                    <p className="text-xs text-zinc-500 mt-0.5">{chat.lastMessage}</p>
+                                </button>
+                            ))
+                        )}
                     </div>
                 </div>
 
@@ -162,7 +186,12 @@ export default function Dashboard() {
                     </button>
 
                     <div className="flex-1 min-w-0">
-                        {currentChat ? (
+                        {isLoading && !currentChat ? (
+                            <div className="animate-pulse">
+                                <div className="h-5 bg-zinc-700/30 rounded w-1/3 mb-1"></div>
+                                <div className="h-3 bg-zinc-800/30 rounded w-1/4"></div>
+                            </div>
+                        ) : currentChat ? (
                             <>
                                 <h2 className="text-sm md:text-lg font-semibold text-zinc-100 truncate">
                                     {currentChat.title}
@@ -183,10 +212,22 @@ export default function Dashboard() {
                 <div className="flex-1 overflow-y-auto px-2 md:px-4 py-4 space-y-3 md:space-y-5 scroll-smooth">
                     {messages.length === 0 ? (
                         <div className="h-full flex items-center justify-center flex-col gap-3">
-                            <div className="text-4xl md:text-6xl animate-bounce">✨</div>
-                            <p className="text-zinc-400 text-center text-xs md:text-sm max-w-sm px-2">
-                                {currentChat ? 'Ask a question' : 'Create new chat'}
-                            </p>
+                            {isLoading ? (
+                                <div className="flex flex-col items-center gap-4">
+                                    <div className="relative w-16 h-16">
+                                        <div className="absolute inset-0 border-4 border-[#31b8c6]/20 rounded-full"></div>
+                                        <div className="absolute inset-0 border-4 border-transparent border-t-[#31b8c6] border-r-[#31b8c6] rounded-full animate-spin"></div>
+                                    </div>
+                                    <p className="text-zinc-400 text-center text-xs md:text-sm">Loading your messages...</p>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="text-4xl md:text-6xl animate-bounce">✨</div>
+                                    <p className="text-zinc-400 text-center text-xs md:text-sm max-w-sm px-2">
+                                        {currentChat ? 'Ask a question' : 'Create new chat'}
+                                    </p>
+                                </>
+                            )}
                         </div>
                     ) : (
                         messages.map((msg, index) => (
@@ -237,7 +278,7 @@ export default function Dashboard() {
                         ))
                     )}
 
-                    {isLoading && (
+                    {isLoading && messages.length > 0 && (
                         <div className="flex justify-start">
                             <div className="bg-zinc-900/60 border border-[#31b8c6]/20 px-3 py-2 md:px-4 md:py-3 rounded-lg rounded-bl-none">
                                 <div className="flex gap-1.5">
@@ -261,16 +302,20 @@ export default function Dashboard() {
                             onChange={e => setInputValue(e.target.value)}
                             onKeyDown={e => e.key === 'Enter' && !isLoading && handleSendMsg()}
                             placeholder="Question pocho..."
-                            className="flex-1 bg-zinc-900/60 border border-[#31b8c6]/30 rounded-lg px-3 py-2 md:px-4 md:py-3 text-xs md:text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-[#31b8c6] focus:ring-1 focus:ring-[#31b8c6]/30 transition disabled:opacity-50"
+                            className="flex-1 bg-zinc-900/60 border border-[#31b8c6]/30 rounded-lg px-3 py-2 md:px-4 md:py-3 text-xs md:text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-[#31b8c6] focus:ring-1 focus:ring-[#31b8c6]/30 transition disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={isLoading}
                         />
 
                         <button
                             onMouseDown={handleSendMsg}
                             disabled={isLoading || !inputValue.trim()}
-                            className="p-1.5 md:p-2 bg-gradient-to-r from-[#31b8c6] to-[#45c7d4] hover:shadow-lg hover:shadow-[#31b8c6]/40 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                            className="p-1.5 md:p-2 bg-gradient-to-r from-[#31b8c6] to-[#45c7d4] hover:shadow-lg hover:shadow-[#31b8c6]/40 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 flex items-center justify-center relative"
                         >
-                            <Send size={16} className="text-zinc-950 md:w-5 md:h-5" />
+                            {isLoading ? (
+                                <Loader size={16} className="text-zinc-950 md:w-5 md:h-5 animate-spin" />
+                            ) : (
+                                <Send size={16} className="text-zinc-950 md:w-5 md:h-5" />
+                            )}
                         </button>
                     </div>
 
