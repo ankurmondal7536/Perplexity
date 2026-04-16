@@ -12,14 +12,17 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// Set build path
+const buildPath = path.resolve(process.cwd(), "backend", "public", "dist");
+
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan('dev'));
 
-// Set build path
-const buildPath = path.join(__dirname, "../public/dist");
+
 
 app.use(cors({
     origin: (origin, callback) => {
@@ -60,10 +63,13 @@ app.use("/api/chats", chatRouter);
 
 // Wildcard route
 app.get(/^\/(?!api).*/, (req, res) => {
-    if (req.path.startsWith('/api')) {
-        return res.status(404).json({ message: 'API not found' });
-    }
-    res.sendFile(path.join(buildPath, 'index.html'));
+    const indexPath = path.join(buildPath, "index.html");
+    res.sendFile(indexPath, (err) => {
+        if (err) {
+            console.error("Error sending index.html:", err);
+            res.status(500).send("Build files not found on server");
+        }
+    });
 });
 
 export default app;
