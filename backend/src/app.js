@@ -6,6 +6,7 @@ import cors from "cors";
 import chatRouter from './routes/chat.routes.js';
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,14 +14,20 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Set build path
-const buildPath = path.resolve(process.cwd(), "backend", "public", "dist");
+// app.js mein sirf ye line change kar:
+const buildPath = path.resolve(__dirname, "..", "public", "dist");
 
+// debugging
+console.log("Checking path:", buildPath);
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan('dev'));
+
+// static files middleware
+app.use(express.static(buildPath));
 
 
 
@@ -44,12 +51,11 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }));
 
-// Serve static files from build directory
-app.use(express.static(buildPath));
+
 
 // Health check
 app.get("/api/health", (req, res) => {
-    res.json({ message: "Server is running" });
+    res.json({ message: "Server is running" ,path: buildPath });
 });
 
 
@@ -66,8 +72,8 @@ app.get(/^\/(?!api).*/, (req, res) => {
     const indexPath = path.join(buildPath, "index.html");
     res.sendFile(indexPath, (err) => {
         if (err) {
-            console.error("Error sending index.html:", err);
-            res.status(500).send("Build files not found on server");
+            console.error("❌ Index.html not found at:", indexPath);
+            res.status(404).send(`Build files not found at: ${indexPath}`);
         }
     });
 });

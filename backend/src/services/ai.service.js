@@ -94,7 +94,7 @@ Additionally, you can use the searchInternet tool to search the internet for cur
 Goal:
 Make the user feel like they are chatting with a smart, chill, helpful friend — not a machine.`
         )
-        const limitedMessage = allmsg.slice(-4)   //  limiting history to 4 messages
+        const limitedMessage = allmsg.slice(-5)   //  limiting history to 4 messages
         const messages = [
             systemPrompt,
             ...limitedMessage.map(msg => {
