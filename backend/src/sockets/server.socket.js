@@ -8,8 +8,7 @@ export function initSocket(httpServer) {
                 "http://localhost:3000",
                 "http://localhost:5173",
                 "http://localhost:5174",
-                process.env.BACKEND_URL,
-                process.env.FRONTEND_URL
+                "https://perplexity-jnxai.onrender.com",
             ],
             methods: ["GET", "POST"],
             credentials: true,

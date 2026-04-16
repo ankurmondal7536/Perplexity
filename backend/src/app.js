@@ -26,9 +26,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan('dev'));
 
-// static files middleware
-app.use(express.static(buildPath));
-
 
 
 app.use(cors({
@@ -37,8 +34,7 @@ app.use(cors({
             'http://localhost:3000',
             'http://localhost:5173',
             'http://localhost:5174',
-            process.env.FRONTEND_URL,
-            process.env.BACKEND_URL
+            'https://perplexity-jnxai.onrender.com' 
         ];
         // Allow requests with no origin (like mobile apps or curl)
         if (!origin || allowedOrigins.includes(origin)) {
@@ -51,7 +47,8 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }));
 
-
+// static files middleware
+app.use(express.static(buildPath));
 
 // Health check
 app.get("/api/health", (req, res) => {
@@ -68,11 +65,11 @@ app.use("/api/auth", authRouter);
 app.use("/api/chats", chatRouter);
 
 // Wildcard route
-app.get(/^\/(?!api).*/, (req, res) => {
+app.get(/^(?!\/api).*$/, (req, res) => {
     const indexPath = path.join(buildPath, "index.html");
     res.sendFile(indexPath, (err) => {
         if (err) {
-            console.error("❌ Index.html not found at:", indexPath);
+            console.error("Index.html not found at:", indexPath);
             res.status(404).send(`Build files not found at: ${indexPath}`);
         }
     });
