@@ -267,7 +267,7 @@ export default function Dashboard() {
 
                         <button
                             onMouseDown={handleSendMsg}
-                            disabled={isLoading || !inputValue.trim() || !currentChatId}
+                            disabled={isLoading || !inputValue.trim()}
                             className="p-1.5 md:p-2 bg-gradient-to-r from-[#31b8c6] to-[#45c7d4] hover:shadow-lg hover:shadow-[#31b8c6]/40 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
                         >
                             <Send size={16} className="text-zinc-950 md:w-5 md:h-5" />
