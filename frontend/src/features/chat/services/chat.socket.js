@@ -6,7 +6,7 @@ export function initializeSocketConnection() {
         ? 'https://perplexity-jnxai.onrender.com'
         : 'http://localhost:3000'
     
-    console.log('🔌 Socket URL:', socketUrl);
+    // console.log('🔌 Socket URL:', socketUrl);
     
     const socket = io(socketUrl, {
        
@@ -15,11 +15,11 @@ export function initializeSocketConnection() {
     });
 
     socket.on('connect', () => {
-        console.log('✅ Socket connected');
+        // console.log('✅ Socket connected');
     });
 
     socket.on('disconnect', () => {
-        console.log('❌ Socket disconnected');
+        // console.log('❌ Socket disconnected');
     });
 
     return socket;

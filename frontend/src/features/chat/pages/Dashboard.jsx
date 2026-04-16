@@ -259,14 +259,14 @@ export default function Dashboard() {
                             type="text"
                             value={inputValue}
                             onChange={e => setInputValue(e.target.value)}
-                            onKeyPress={e => e.key === 'Enter' && !isLoading && handleSendMsg()}
+                            onKeyDown={e => e.key === 'Enter' && !isLoading && handleSendMsg()}
                             placeholder="Question pocho..."
                             className="flex-1 bg-zinc-900/60 border border-[#31b8c6]/30 rounded-lg px-3 py-2 md:px-4 md:py-3 text-xs md:text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-[#31b8c6] focus:ring-1 focus:ring-[#31b8c6]/30 transition disabled:opacity-50"
                             disabled={isLoading}
                         />
 
                         <button
-                            onClick={handleSendMsg}
+                            onMouseDown={handleSendMsg}
                             disabled={isLoading || !inputValue.trim() || !currentChatId}
                             className="p-1.5 md:p-2 bg-gradient-to-r from-[#31b8c6] to-[#45c7d4] hover:shadow-lg hover:shadow-[#31b8c6]/40 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
                         >
@@ -284,7 +284,7 @@ export default function Dashboard() {
             {sidebarOpen && (
                 <div
                     className="fixed inset-0 bg-black/50 z-40 md:hidden"
-                    onClick={() => setSidebarOpen(false)}
+                    onMouseDown={() => setSidebarOpen(false)}
                 ></div>
             )}
         </div>

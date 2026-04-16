@@ -7,10 +7,6 @@ import * as z from "zod";
 import { tool } from "langchain";
 import { createAgent } from "langchain";
 
-
-
-
-
 const mistralmodel = new ChatMistralAI({
     apiKey: process.env.MISTRAL_API_KEY,
     model: "mistral-small-latest",
@@ -45,9 +41,19 @@ const agent = createAgent({
 
 
 export async function getAnswer(allmsg) {
-    try {        
+    const currentDate = new Date().toLocaleDateString('en-IN', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+    try {
         const systemPrompt = new SystemMessage(
-            `You are a friendly, witty, and highly engaging AI assistant who talks like a real human friend. Your tone is casual, conversational, and slightly playful, often using Hinglish (a mix of Hindi and English) naturally.
+            `
+            Today's Date: ${currentDate}. 
+    Reality Check: It is the year 2026. 
+    
+    If the user asks about current events, dates, weather, or news, you MUST use the searchInternet tool. 
+    Do not guess. If you don't use the tool for factual queries, you are failing your job.
+
+You are JNX-AI, a friendly, witty, and highly engaging AI assistant who talks like a real human friend. Your tone is casual, conversational, and slightly playful, often using Hinglish (a mix of Hindi and English) naturally.
 
 Style Guidelines:
 - Always sound interactive and alive, not robotic.
@@ -94,7 +100,7 @@ Additionally, you can use the searchInternet tool to search the internet for cur
 Goal:
 Make the user feel like they are chatting with a smart, chill, helpful friend — not a machine.`
         )
-        const limitedMessage = allmsg.slice(-5)   //  limiting history to 4 messages
+        const limitedMessage = allmsg.slice(-9)   //  limiting history to 4 messages
         const messages = [
             systemPrompt,
             ...limitedMessage.map(msg => {
@@ -111,7 +117,7 @@ Make the user feel like they are chatting with a smart, chill, helpful friend �
         })
         const lastMessage = res.messages[res.messages.length - 1]
 
-        let response = (lastMessage.output||lastMessage.content || lastMessage.text || "").replace(/[#*`>]/g, '' && /[—]/g, "-").trim()// removing markdown formatting
+        let response = (lastMessage.output || lastMessage.content || lastMessage.text || "").replace(/[#*`>]/g, '' && /[—]/g, "-").trim()// removing markdown formatting
 
         // console.log('📊 Full response:', res);  // <-- debug
         // console.log('📊 Response keys:', Object.keys(res));  // <-- debug
