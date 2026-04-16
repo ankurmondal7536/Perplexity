@@ -17,4 +17,5 @@ authRouter.get("/get-me", authMiddleware, getMe);
 // verify email
 authRouter.get("/verify-email", verifyEmail);
 
+
 export default authRouter;
