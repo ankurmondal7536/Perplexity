@@ -83,7 +83,12 @@ export async function login(req, res) {
         email: user.email
     }, process.env.JWT_SECRET);
 
-    res.cookie("token", token)
+    res.cookie("token", token, {
+        httpOnly: true,               // security: httpOnly cookies are not accessible from client-side JavaScript
+        secure: process.env.NODE_ENV === "production", // Render par true, localhost par false
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Cross-site fix
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 din tak login rahega
+    });
 
     return res.status(200).json({
         message: "Login successful",
